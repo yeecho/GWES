@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_margin="60dp"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <EditText
+        android:id="@+id/edt_user"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:hint="设置账号"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"/>
+    <TextView
+        android:id="@+id/txt_user_tips"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="该账号可用"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@+id/edt_user"
+        app:layout_constraintLeft_toLeftOf="parent"/>
+
+    <EditText
+        android:id="@+id/edt_pswd"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:hint="设置密码"
+        android:inputType="textPassword"
+        app:layout_constraintTop_toBottomOf="@+id/txt_user_tips"
+        app:layout_constraintLeft_toLeftOf="parent"/>
+
+    <EditText
+        android:id="@+id/edt_pswd2"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:hint="确认密码"
+        android:inputType="textPassword"
+        app:layout_constraintTop_toBottomOf="@+id/edt_pswd"
+        app:layout_constraintLeft_toLeftOf="parent"/>
+
+    <EditText
+        android:id="@+id/edt_phone"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:hint="手机号码"
+        android:inputType="phone"
+        app:layout_constraintTop_toBottomOf="@+id/edt_pswd2"
+        app:layout_constraintLeft_toLeftOf="parent"/>
+
+    <EditText
+        android:id="@+id/edt_check_code"
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:hint="验证码"
+        android:inputType="phone"
+        app:layout_constraintTop_toBottomOf="@+id/edt_phone"
+        app:layout_constraintLeft_toLeftOf="parent"/>
+
+    <Button
+        android:id="@+id/btn_send_code"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="发送"
+        app:layout_constraintTop_toTopOf="@+id/edt_check_code"
+        app:layout_constraintBottom_toBottomOf="@+id/edt_check_code"
+        app:layout_constraintRight_toRightOf="parent"/>
+
+    <Button
+        android:id="@+id/btn_register"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="注册"
+        app:layout_constraintTop_toBottomOf="@+id/edt_check_code"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"/>
+
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
