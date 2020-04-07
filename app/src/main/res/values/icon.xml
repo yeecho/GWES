@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="icon_user">&#xe603;</string>
+    <string name="icon_lock">&#xe613;</string>
+    <string name="icon_home">&#xe670;</string>
+    <string name="icon_talk">&#xe61e;</string>
+    <string name="icon_mine">&#xe641;</string>
+</resources>
