@@ -15,12 +15,15 @@ import org.json.JSONObject;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 
@@ -89,8 +92,226 @@ public class Yhttp {
         }
     }
 
-    public static void downloadApk(){
+    public static void register(String username, String password, String phonenumber){
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                HttpURLConnection connection = null;
+                // 封装CollegeStudent
+                try {
+                    JSONObject jsonObject = new JSONObject();
+                    jsonObject.put("", 1);
+                    jsonObject.put("name", "WangXiaoNao");
+                    jsonObject.put("age", 20);
 
+                    String s = String.valueOf(jsonObject);
+
+//                    Log.d(TAG, "run: ------>" + s);
+                    URL url = new URL("http://XXX:8080/ReceiveJson");
+                    connection = (HttpURLConnection) url.openConnection();
+                    connection.setConnectTimeout(5000);
+                    connection.setConnectTimeout(5000);
+                    connection.setRequestMethod("POST");
+                    connection.setDoOutput(true);
+                    connection.setRequestProperty("User-Agent", "Fiddler");
+                    connection.setRequestProperty("Content-Type", "application/json");
+                    connection.setRequestProperty("Charset", "UTF-8");
+                    OutputStream outputStream = connection.getOutputStream();
+                    outputStream.write(s.getBytes());
+                    outputStream.close();
+                    if (200 == connection.getResponseCode()) {
+                        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(connection.getInputStream(), "utf-8"));
+
+                        String line = null;
+                        String responseData = "";
+                        while ((line = bufferedReader.readLine()) != null) {
+                            responseData += line;
+
+                        }
+
+//                        Toast.makeText(MainActivity.this, "后台返回的数据:" + responseData, Toast.LENGTH_SHORT).show();
+
+                    }
+
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                } catch (MalformedURLException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+            }
+
+        }).start();
+    }
+
+    /**
+     * 使用GET访问网络
+     *
+     * @param username
+     * @param password
+     * @return 服务器返回的结果
+     */
+    public static String loginOfGet(String username, String password) {
+
+        HttpURLConnection sConnection = null;
+
+        String data = "username=" + username + "&password=" + password;
+
+        try {
+            URL url = new URL("http://XXX:8080/Login?" + data);
+            sConnection = (HttpURLConnection) url.openConnection();
+            sConnection.setRequestMethod("GET");
+            sConnection.setConnectTimeout(10000);
+            sConnection.setReadTimeout(10000);
+            sConnection.connect();
+
+            int code = sConnection.getResponseCode();
+            if (code == 200) {
+
+                InputStream is = sConnection.getInputStream();
+                String state = getStringFromInputStream(is);
+                return state;
+            }
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+
+            if (sConnection != null) {
+                sConnection.disconnect();
+            }
+
+        }
+
+
+        return null;
+
+    }
+
+    /**
+     * 使用POST访问网络
+     *
+     * @param username
+     * @param password
+     * @return 服务器返回的结果
+     */
+    public static String LoginOfPost(String username, String password) {
+        HttpURLConnection connection = null;
+        try {
+            URL url = new URL("http://XXX:8080/Login");
+            connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("POST");
+            connection.setConnectTimeout(10000);
+            connection.setReadTimeout(10000);
+
+
+            /**
+             *
+             *  public void setDoOutput(boolean dooutput)
+             *          将此 URLConnection 的 doOutput 字段的值设置为指定的值.
+             *          URL 连接可用于输入和/或输出。如果打算使用 URL 连接进行输出，
+             *          则将 DoOutput 标志设置为 true；如果不打算使用，则设置为 false。默认值为 false。
+             *          简单一句话：get请求的话默认就行了，post请求需要setDoOutput(true)，这个默认是false的。
+             */
+            connection.setDoOutput(true);
+
+            String data = "username=" + username + "&password=" + password;
+            OutputStream outputStream = connection.getOutputStream();
+            outputStream.write(data.getBytes());
+            outputStream.flush();
+            outputStream.close();
+
+            connection.connect();
+
+            if (200 == connection.getResponseCode()) {
+                InputStream is = connection.getInputStream();
+                String state = getStringFromInputStream(is);
+                return state;
+            }
+
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+
+        return null;
+
+    }
+    /**
+     * 使用POST访问网络
+     *
+     * @param username
+     * @param password
+     * @return 服务器返回的结果
+     */
+    public static String RegisterUser(String username, String password, String phonenumber) {
+        HttpURLConnection connection = null;
+        try {
+            URL url = new URL("http://XXX:8080/Login");
+            connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("POST");
+            connection.setConnectTimeout(10000);
+            connection.setReadTimeout(10000);
+
+            /**
+             *
+             *  public void setDoOutput(boolean dooutput)
+             *          将此 URLConnection 的 doOutput 字段的值设置为指定的值.
+             *          URL 连接可用于输入和/或输出。如果打算使用 URL 连接进行输出，
+             *          则将 DoOutput 标志设置为 true；如果不打算使用，则设置为 false。默认值为 false。
+             *          简单一句话：get请求的话默认就行了，post请求需要setDoOutput(true)，这个默认是false的。
+             */
+            connection.setDoOutput(true);
+
+            String data = "username=" + username + "&password=" + password + "&phonenumber" + phonenumber;
+            OutputStream outputStream = connection.getOutputStream();
+            outputStream.write(data.getBytes());
+            outputStream.flush();
+            outputStream.close();
+
+            connection.connect();
+
+            if (200 == connection.getResponseCode()) {
+                InputStream is = connection.getInputStream();
+                String state = getStringFromInputStream(is);
+                return state;
+            }
+
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return null;
+
+    }
+
+    private static String getStringFromInputStream(InputStream is) throws Exception {
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        byte[] buff = new byte[1024];
+        int len = -1;
+        while ((len = is.read(buff)) != -1) {
+            baos.write(buff, 0, len);
+        }
+        is.close();
+        String html = baos.toString();
+        baos.close();
+
+        return html;
     }
 
 
