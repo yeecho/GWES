@@ -8,6 +8,7 @@ import android.util.JsonReader;
 import android.util.Log;
 
 import com.yuanye.gwes.Constant.YC;
+import com.yuanye.gwes.callback.RegisterCallback;
 import com.yuanye.gwes.callback.VersionCheckCallback;
 
 import org.json.JSONException;
@@ -92,7 +93,7 @@ public class Yhttp {
         }
     }
 
-    public static void register(String username, String password, String phonenumber){
+    public static void register(final String username, final String password, final String phoneNumber, final RegisterCallback callback){
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -100,14 +101,14 @@ public class Yhttp {
                 // 封装CollegeStudent
                 try {
                     JSONObject jsonObject = new JSONObject();
-                    jsonObject.put("", 1);
-                    jsonObject.put("name", "WangXiaoNao");
-                    jsonObject.put("age", 20);
+                    jsonObject.put("userName", username);
+                    jsonObject.put("passWord", password);
+                    jsonObject.put("phoneNumber", phoneNumber);
 
                     String s = String.valueOf(jsonObject);
 
 //                    Log.d(TAG, "run: ------>" + s);
-                    URL url = new URL("http://XXX:8080/ReceiveJson");
+                    URL url = new URL(YC.API_REGISTER);
                     connection = (HttpURLConnection) url.openConnection();
                     connection.setConnectTimeout(5000);
                     connection.setConnectTimeout(5000);
@@ -128,7 +129,7 @@ public class Yhttp {
                             responseData += line;
 
                         }
-
+                        callback.onGet(responseData);
 //                        Toast.makeText(MainActivity.this, "后台返回的数据:" + responseData, Toast.LENGTH_SHORT).show();
 
                     }

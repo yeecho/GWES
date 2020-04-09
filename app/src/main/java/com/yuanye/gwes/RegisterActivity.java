@@ -15,8 +15,10 @@ import android.widget.TextView;
 import com.yuanye.gwes.Constant.YC;
 import com.yuanye.gwes.bean.RIS;
 import com.yuanye.gwes.bean.Tips;
+import com.yuanye.gwes.callback.RegisterCallback;
 import com.yuanye.gwes.model.RegisterModel;
 import com.yuanye.gwes.utils.YY;
+import com.yuanye.gwes.utils.Yhttp;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
@@ -113,6 +115,12 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
 //                registerModel.setBtnRegisterState();
                 break;
             case R.id.btn_register:
+                Yhttp.register(edtUsername.getText().toString(), edtPswd.getText().toString(), edtPhone.getText().toString(), new RegisterCallback() {
+                    @Override
+                    public void onGet(String responseData) {
+                        Log.d("responseData", responseData);
+                    }
+                });
                 break;
             case R.id.img_pswd_show:
                 YY.changeInputType(edtPswd);
@@ -192,10 +200,9 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
 
         @Override
         public void onTextChanged(CharSequence s, int start, int before, int count) {
-            Log.d("onTextChanged", "CharSequence:"+s+" start:"+start+" before:"+before);
+//            Log.d("onTextChanged", "CharSequence:"+s+" start:"+start+" before:"+before);
 //            if(!s.toString().matches("[^a-zA-Z0-9]")){
             if(!s.toString().matches("^[a-zA-Z0-9_-]{4,16}$")){
-                Log.d("tag", "格式匹配"+s.toString().matches("[^a-zA-Z0-9]"));
                 tips.setContent("格式不对，只允许字母和数字");
                 tips.setColor(Color.RED);
             }else{

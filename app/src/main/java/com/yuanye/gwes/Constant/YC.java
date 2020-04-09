@@ -4,6 +4,8 @@ public class YC {
     public static final String VERSION_FILE_REMOTE = "http://yeecho.qicp.vip/GWES/code/version_code.txt";
     public static final String APK_FILE_REMOTE = "http://yeecho.qicp.vip/GWES/code/GWES.apk";
 
+    public static final String API_REGISTER = "http://p3044535x9.qicp.vip/api/User";
+
     public static final String REGEX_USERNAME = "^[a-zA-Z0-9_-]{4,16}$";
     public static final String REGEX_PASSWORD_HIGN = "^.*(?=.{6,})(?=.*\\d)(?=.*[A-Z])(?=.*[a-z])(?=.*[!@#$%^&*? ]).*$";
     public static final String REGEX_PASSWORD_NORMAL = "^.*(?=.{6,})(?=.*\\d)(?=.*[A-Z])(?=.*[a-z])(?=.*[!@#$%^&*? ]).*$";
