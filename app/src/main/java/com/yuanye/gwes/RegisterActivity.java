@@ -1,5 +1,6 @@
 package com.yuanye.gwes;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.text.Editable;
@@ -11,14 +12,19 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.yuanye.gwes.Constant.YC;
+import com.yuanye.gwes.app.MyApp;
 import com.yuanye.gwes.bean.RIS;
 import com.yuanye.gwes.bean.Tips;
 import com.yuanye.gwes.callback.RegisterCallback;
 import com.yuanye.gwes.model.RegisterModel;
 import com.yuanye.gwes.utils.YY;
 import com.yuanye.gwes.utils.Yhttp;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
@@ -56,7 +62,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
             @Override
             public void onChanged(RIS ris) {
                 Log.d("onChanged:","user:"+ris.isbUser()+" pswd:"+ris.isbPswd()+" pswd2:"+ris.isbPswd2()+" phone:"+ris.isbPhone());
-                btnRegister.setClickable(ris.getState());
+//                btnRegister.setClickable(ris.getState());
             }
         });
         registerModel.getUserTips().observe(this, new Observer<Tips>() {
@@ -115,12 +121,33 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
 //                registerModel.setBtnRegisterState();
                 break;
             case R.id.btn_register:
-                Yhttp.register(edtUsername.getText().toString(), edtPswd.getText().toString(), edtPhone.getText().toString(), new RegisterCallback() {
-                    @Override
-                    public void onGet(String responseData) {
-                        Log.d("responseData", responseData);
-                    }
-                });
+                if (checkInfo()){
+                    Yhttp.register(edtUsername.getText().toString(), edtPswd.getText().toString(), edtPhone.getText().toString(), new RegisterCallback() {
+                        @Override
+                        public void onResponse(JSONObject jo) {
+                            Log.d("register-ok", "注册成功："+jo.toString());
+                            try {
+                                String id = jo.getString("id");
+                                Intent intent = new Intent();
+                                intent.putExtra("id", id);
+                                setResult(YC.REGISTER_OK, intent);
+                                RegisterActivity.this.finish();
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+//                            Toast.makeText(RegisterActivity.this, "注册成功", Toast.LENGTH_LONG).show();
+                        }
+
+                        @Override
+                        public void onFail(int code, String msg) {
+                            Log.d("register-fail", "错误码："+code+" msg："+msg);
+//                            Toast.makeText(RegisterActivity.this, "错误码："+code+" msg"+msg, Toast.LENGTH_LONG).show();
+                        }
+                    });
+                }else{
+                    Toast.makeText(this, "注册信息有误", Toast.LENGTH_SHORT).show();
+                }
+
                 break;
             case R.id.img_pswd_show:
                 YY.changeInputType(edtPswd);
@@ -129,6 +156,39 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                 YY.changeInputType(edtPswd2);
                 break;
         }
+    }
+
+    private boolean checkInfo() {
+        boolean b1 = edtUsername.getText().toString().matches(YC.REGEX_USERNAME);
+        if (b1){
+            txtUsername.setText("");
+        }else{
+            txtUsername.setText("格式不对");
+            txtPswd.setTextColor(Color.RED);
+        }
+        boolean b2 = edtPswd.getText().toString().matches(YC.REGEX_PASSWORD_LOW);
+        if (b2){
+            txtPswd.setText("");
+        }else{
+            txtPswd.setText("格式不对");
+            txtPswd.setTextColor(Color.RED);
+        }
+        boolean b3 = edtPswd.getText().toString().equals(edtPswd2.getText().toString());
+        if (b3){
+            txtPswd2.setText("");
+            txtPswd2.setTextColor(Color.BLUE);
+        }else{
+            txtPswd2.setText("密码不一致");
+            txtPswd2.setTextColor(Color.RED);
+        }
+        boolean b4 = edtPhone.getText().toString().matches(YC.REGEX_PHONE);
+        if (b4){
+            txtPhone.setText("");
+        }else{
+            txtPhone.setText("格式有误");
+            txtPhone.setTextColor(Color.RED);
+        }
+        return b1 & b2 & b3 & b4;
     }
 
     @Override
@@ -187,43 +247,6 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                 break;
         }
 
-    }
-
-    class TW1 implements TextWatcher {
-
-        Tips tips = new Tips();
-
-        @Override
-        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-        }
-
-        @Override
-        public void onTextChanged(CharSequence s, int start, int before, int count) {
-//            Log.d("onTextChanged", "CharSequence:"+s+" start:"+start+" before:"+before);
-//            if(!s.toString().matches("[^a-zA-Z0-9]")){
-            if(!s.toString().matches("^[a-zA-Z0-9_-]{4,16}$")){
-                tips.setContent("格式不对，只允许字母和数字");
-                tips.setColor(Color.RED);
-            }else{
-                if (s.length()<4){
-                    tips.setContent("用户名太短了，至少4位");
-                    tips.setColor(Color.DKGRAY);
-                }else if(s.length()>24){
-                    tips.setContent("你的太长了");
-                    tips.setColor(Color.DKGRAY);
-                }else{
-                    tips.setContent("长度合格");
-                    tips.setColor(Color.BLUE);
-                }
-            }
-            registerModel.getUserTips().postValue(tips);
-        }
-
-        @Override
-        public void afterTextChanged(Editable s) {
-
-        }
     }
 
 }

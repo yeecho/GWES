@@ -122,24 +122,25 @@ public class Yhttp {
                     outputStream.close();
                     if (200 == connection.getResponseCode()) {
                         BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(connection.getInputStream(), "utf-8"));
-
                         String line = null;
                         String responseData = "";
                         while ((line = bufferedReader.readLine()) != null) {
                             responseData += line;
-
                         }
-                        callback.onGet(responseData);
-//                        Toast.makeText(MainActivity.this, "后台返回的数据:" + responseData, Toast.LENGTH_SHORT).show();
-
+                        callback.onResponse(new JSONObject(responseData));
+                    }else{
+                        callback.onFail(connection.getResponseCode(), "未知错误");
                     }
 
 
                 } catch (JSONException e) {
+                    callback.onFail(-1, "json解析错误");
                     e.printStackTrace();
                 } catch (MalformedURLException e) {
+                    callback.onFail(-1, "URL相关错误");
                     e.printStackTrace();
                 } catch (IOException e) {
+                    callback.onFail(-1, "IO错误");
                     e.printStackTrace();
                 }
 
