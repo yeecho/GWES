@@ -7,9 +7,14 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 
 import com.yuanye.gwes.Constant.YC;
 import com.yuanye.gwes.app.MyApp;
+import com.yuanye.gwes.callback.LoginCallback;
+import com.yuanye.gwes.utils.Yhttp;
+
+import org.json.JSONObject;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
@@ -19,6 +24,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
     public String TAG = "LoginActivity";
 
+    private EditText edtUsername,edtPassword;
     private Button btnLogin, btnRegister;
     private Context context;
 
@@ -37,6 +43,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     }
 
     private void initView() {
+        edtUsername = findViewById(R.id.edt_user);
+        edtPassword = findViewById(R.id.edt_pswd);
         btnLogin = findViewById(R.id.btn_login);
         btnRegister = findViewById(R.id.btn_register);
         btnRegister.setOnClickListener(this);
@@ -57,6 +65,21 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     public void onClick(View v) {
         switch (v.getId()){
             case R.id.btn_login:
+                if (checkInfo()){
+                    Yhttp.login(edtUsername.getText().toString(), edtPassword.getText().toString(),
+                            new LoginCallback() {
+                                @Override
+                                public void onSuccess(JSONObject jo) {
+
+                                }
+
+                                @Override
+                                public void onFail(int i, String msg) {
+
+                                }
+                            });
+                }
+
                 break;
             case R.id.btn_register:
                 Intent intent = new Intent(context, RegisterActivity.class);
@@ -65,16 +88,18 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         }
     }
 
+    private boolean checkInfo() {
+        boolean b = edtUsername.getText().toString().matches(YC.REGEX_USERNAME);
+        boolean b1 = edtPassword.getText().toString().matches(YC.REGEX_PASSWORD_LOW);
+        return b && b1;
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         Log.d("onActivityResult", "requestCode:"+requestCode + " resultCode:"+resultCode);
         if (requestCode == YC.REGISTER_OK){
-            MyApp.id = data.getStringExtra("id");
-            setResult(YC.LOGIN_OK);
-            finish();
-        }else{
-            MyApp.id = "adad";
+            MyApp.id = data.getStringExtra("data");
             setResult(YC.LOGIN_OK);
             finish();
         }

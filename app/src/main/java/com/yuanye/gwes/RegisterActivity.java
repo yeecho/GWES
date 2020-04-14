@@ -34,8 +34,9 @@ import androidx.lifecycle.ViewModelProviders;
 
 public class RegisterActivity extends AppCompatActivity implements View.OnClickListener, View.OnFocusChangeListener {
 
-    private EditText edtUsername,edtPswd,edtPswd2,edtPhone,edtCheckCode;
-    private TextView txtUsername,txtPswd,txtPswd2,txtPhone,txtCheckCode;
+    private String tag = "RegisterActivity";
+    private EditText edtUsername,edtPswd,edtPswd2,edtPhone;
+    private TextView txtUsername,txtPswd,txtPswd2,txtPhone,txtRegisterTips;
     private ImageView imgPswdShow, imgPswdShow2;
     private Button btnSendCode, btnRegister;
 
@@ -72,6 +73,12 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                 txtUsername.setTextColor(tips.getColor());
             }
         });
+        registerModel.getRegisterTips().observe(this, new Observer<String>() {
+            @Override
+            public void onChanged(String s) {
+                txtRegisterTips.setText(s);
+            }
+        });
     }
 
     private void initListener() {
@@ -92,12 +99,11 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         edtPswd = findViewById(R.id.edt_pswd);
         edtPswd2 = findViewById(R.id.edt_pswd2);
         edtPhone = findViewById(R.id.edt_phone);
-        edtCheckCode = findViewById(R.id.edt_check_code);
         txtUsername = findViewById(R.id.txt_user_tips);
         txtPswd = findViewById(R.id.txt_pswd_tips);
         txtPswd2 = findViewById(R.id.txt_pswd_tips2);
         txtPhone = findViewById(R.id.txt_phone_tips);
-        txtCheckCode = findViewById(R.id.txt_code_tips);
+        txtRegisterTips = findViewById(R.id.txt_register_tips);
         imgPswdShow = findViewById(R.id.img_pswd_show);
         imgPswdShow2 = findViewById(R.id.img_pswd_show2);
         btnSendCode = findViewById(R.id.btn_send_code);
@@ -117,21 +123,25 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
     @Override
     public void onClick(View v) {
         switch (v.getId()){
-            case R.id.btn_send_code:
-//                registerModel.setBtnRegisterState();
-                break;
             case R.id.btn_register:
                 if (checkInfo()){
                     Yhttp.register(edtUsername.getText().toString(), edtPswd.getText().toString(), edtPhone.getText().toString(), new RegisterCallback() {
                         @Override
                         public void onResponse(JSONObject jo) {
-                            Log.d("register-ok", "注册成功："+jo.toString());
+                            Log.d(tag, "注册回复："+jo.toString());
                             try {
-                                String id = jo.getString("id");
-                                Intent intent = new Intent();
-                                intent.putExtra("id", id);
-                                setResult(YC.REGISTER_OK, intent);
-                                RegisterActivity.this.finish();
+                                String result = jo.getString("result");
+                                String msg = jo.getString("msg");
+                                String data = jo.getString("data");
+                                if (result.equals("true")){
+                                    Intent intent = new Intent();
+                                    intent.putExtra("data", data);
+                                    setResult(YC.REGISTER_OK, intent);
+                                    RegisterActivity.this.finish();
+                                }else{
+                                    registerModel.getRegisterTips().postValue("注册失败："+msg);
+                                }
+
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }
@@ -140,7 +150,8 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
 
                         @Override
                         public void onFail(int code, String msg) {
-                            Log.d("register-fail", "错误码："+code+" msg："+msg);
+                            Log.d(tag, "错误码："+code+" msg："+msg);
+                            registerModel.getRegisterTips().postValue("注册失败! "+ " 错误码："+code+" msg："+msg);
 //                            Toast.makeText(RegisterActivity.this, "错误码："+code+" msg"+msg, Toast.LENGTH_LONG).show();
                         }
                     });

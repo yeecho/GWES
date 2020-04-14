@@ -8,6 +8,7 @@ import android.util.JsonReader;
 import android.util.Log;
 
 import com.yuanye.gwes.Constant.YC;
+import com.yuanye.gwes.callback.LoginCallback;
 import com.yuanye.gwes.callback.RegisterCallback;
 import com.yuanye.gwes.callback.VersionCheckCallback;
 
@@ -91,6 +92,63 @@ public class Yhttp {
         } catch (SecurityException se) {
             Log.e("SYNC getUpdate", "security error", se);
         }
+    }
+
+    public static void login(final String username, final String password, final LoginCallback callback){
+            HttpURLConnection connection = null;
+            // 封装CollegeStudent
+            try {
+                JSONObject jsonObject = new JSONObject();
+                jsonObject.put("userName", username);
+                jsonObject.put("passWord", password);
+
+                String s = String.valueOf(jsonObject);
+
+//                    Log.d(TAG, "run: ------>" + s);
+                URL url = new URL(YC.API_REGISTER);
+                connection = (HttpURLConnection) url.openConnection();
+                connection.setConnectTimeout(5000);
+                connection.setConnectTimeout(5000);
+                connection.setRequestMethod("POST");
+                connection.setDoOutput(true);
+                connection.setRequestProperty("User-Agent", "Fiddler");
+                connection.setRequestProperty("Content-Type", "application/json");
+                connection.setRequestProperty("Charset", "UTF-8");
+                OutputStream outputStream = connection.getOutputStream();
+                outputStream.write(s.getBytes());
+                outputStream.close();
+                if (200 == connection.getResponseCode()) {
+                    BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(connection.getInputStream(), "utf-8"));
+                    String line = null;
+                    String responseData = "";
+                    while ((line = bufferedReader.readLine()) != null) {
+                        responseData += line;
+                    }
+                    JSONObject jo = new JSONObject(responseData);
+                    String result = jo.getString("result");
+                    String msg = jo.getString("msg");
+                    String data = jo.getString("data");
+                    if (result.equals(true)){
+//                        callback.onSuccess(data);
+                    }else{
+                        callback.onFail(-1, msg);
+                    }
+                }else{
+                    callback.onFail(connection.getResponseCode(), "未知错误");
+                }
+
+
+            } catch (JSONException e) {
+                callback.onFail(-1, "json解析错误");
+                e.printStackTrace();
+            } catch (MalformedURLException e) {
+                callback.onFail(-1, "URL相关错误");
+                e.printStackTrace();
+            } catch (IOException e) {
+                callback.onFail(-1, "IO错误");
+                e.printStackTrace();
+            }
+
     }
 
     public static void register(final String username, final String password, final String phoneNumber, final RegisterCallback callback){

@@ -12,7 +12,10 @@ import androidx.lifecycle.ViewModel;
 public class RegisterModel extends ViewModel {
 
     private MutableLiveData<RIS> validInfo;
+
+
     private MutableLiveData<Tips> userTips;
+    private MutableLiveData<String> registerTips;
 
     private RIS ris;
 
@@ -22,6 +25,7 @@ public class RegisterModel extends ViewModel {
         validInfo.postValue(ris);
         userTips = new MutableLiveData<>();
         userTips.postValue(new Tips("", Color.BLACK));
+        registerTips = new MutableLiveData<>();
     }
 
     public MutableLiveData<Tips> getUserTips() {
@@ -30,6 +34,10 @@ public class RegisterModel extends ViewModel {
 
     public LiveData<RIS> getValidInfo(){
         return validInfo;
+    }
+
+    public MutableLiveData<String> getRegisterTips() {
+        return registerTips;
     }
 
     public void setValidInfo(int index, boolean b){
